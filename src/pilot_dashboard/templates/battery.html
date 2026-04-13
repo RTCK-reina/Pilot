@@ -1,0 +1,160 @@
+{% if not fragment %}{% extends "base.html" %}{% endif %}
+{% block title %}PiLot - Battery{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1 class="page-header__title">Battery Health</h1>
+</div>
+
+<div class="grid grid--battery">
+  <!-- Battery Summary -->
+  <div class="card card--full">
+    <div class="card__body">
+      <div class="stat-row stat-row--4">
+        <div class="stat stat--highlight-efficiency">
+          <span class="stat__value">{% if current_soc is not none %}{{ current_soc }}%{% else %}--{% endif %}</span>
+          <span class="stat__label">Current SOC</span>
+        </div>
+        <div class="stat">
+          <span class="stat__value">{% if current_range is not none %}{{ "%.1f"|format(current_range) }}{% else %}--{% endif %}</span>
+          <span class="stat__label">Range (km)</span>
+        </div>
+        <div class="stat">
+          <span class="stat__value">{% if full_range is not none %}{{ "%.0f"|format(full_range) }}{% else %}--{% endif %}</span>
+          <span class="stat__label">Full Range (km)</span>
+        </div>
+        <div class="stat">
+          <span class="stat__value">{{ "%.1f"|format(est_cycles) }}</span>
+          <span class="stat__label">Est. Cycles</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Capacity Info -->
+  <div class="card">
+    <div class="card__header">
+      <h2 class="card__title">Battery Info</h2>
+    </div>
+    <div class="card__body">
+      <dl class="data-list">
+        <div class="data-list__item">
+          <dt>Usable Capacity</dt>
+          <dd>{{ "%.1f"|format(capacity_kwh) }} kWh</dd>
+        </div>
+        <div class="data-list__item">
+          <dt>Battery Type</dt>
+          <dd>{{ battery_type or '--' }}</dd>
+        </div>
+        <div class="data-list__item">
+          <dt>Total Energy Used</dt>
+          <dd>{{ "%.1f"|format(total_energy) }} kWh</dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+
+  {% if is_lfp %}
+  <!-- LFP Recommendation -->
+  <div class="card">
+    <div class="card__header">
+      <h2 class="card__title">LFP Battery Tips</h2>
+    </div>
+    <div class="card__body">
+      <p class="card__hint" style="font-size: var(--font-sm); line-height: 1.6;">
+        LFP (&#x30EA;&#x30F3;&#x9178;&#x9244;) &#x30D0;&#x30C3;&#x30C6;&#x30EA;&#x30FC;&#x306F;&#x3001;&#x9031;&#x306B;1&#x56DE;100%&#x307E;&#x3067;&#x5145;&#x96FB;&#x3059;&#x308B;&#x3053;&#x3068;&#x3092;&#x304A;&#x52E7;&#x3081;&#x3057;&#x307E;&#x3059;&#x3002;
+        SOC&#x30AD;&#x30E3;&#x30EA;&#x30D6;&#x30EC;&#x30FC;&#x30B7;&#x30E7;&#x30F3;&#x304C;&#x6B63;&#x78BA;&#x306B;&#x306A;&#x308A;&#x3001;&#x822A;&#x7D9A;&#x8DDD;&#x96E2;&#x306E;&#x8868;&#x793A;&#x304C;&#x6539;&#x5584;&#x3055;&#x308C;&#x307E;&#x3059;&#x3002;
+      </p>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Degradation Over Time -->
+  <div class="card card--wide">
+    <div class="card__header">
+      <h2 class="card__title">Degradation Over Time</h2>
+    </div>
+    <div class="card__body">
+      <div class="chart-container chart-container--lg">
+        <canvas id="degradation-chart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- SOC Distribution -->
+  <div class="card">
+    <div class="card__header">
+      <h2 class="card__title">SOC Distribution</h2>
+    </div>
+    <div class="card__body">
+      <div class="chart-container">
+        <canvas id="soc-distribution-chart"></canvas>
+      </div>
+      <p class="card__hint">Time spent at each SOC range</p>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Degradation Over Time (line chart)
+  const degradation = {{ degradation | tojson }};
+  if (degradation.length > 0) {
+    new Chart(document.getElementById('degradation-chart').getContext('2d'), {
+      type: 'line',
+      data: {
+        labels: degradation.map(d => d.date),
+        datasets: [{
+          label: 'Max Range (km) at 95%+ SOC',
+          data: degradation.map(d => d.max_range),
+          borderColor: '#34d399',
+          backgroundColor: 'rgba(52,211,153,0.1)',
+          fill: true, tension: 0.3, pointRadius: 3,
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { labels: { color: '#9aa0b0' } } },
+        scales: {
+          x: { grid: { color: '#2e3344' }, ticks: { color: '#9aa0b0' } },
+          y: { grid: { color: '#2e3344' }, ticks: { color: '#9aa0b0' } }
+        }
+      }
+    });
+  }
+
+  // SOC Distribution (bar chart)
+  const socDist = {{ soc_distribution | tojson }};
+  if (socDist.length > 0) {
+    const socColors = socDist.map(d => {
+      const band = d.soc_band;
+      if (band < 20) return '#ef4444';
+      if (band < 50) return '#eab308';
+      if (band < 80) return '#22c55e';
+      return '#34d399';
+    });
+    new Chart(document.getElementById('soc-distribution-chart').getContext('2d'), {
+      type: 'bar',
+      data: {
+        labels: socDist.map(d => d.soc_band + '%'),
+        datasets: [{
+          label: 'Count',
+          data: socDist.map(d => d.count),
+          backgroundColor: socColors,
+          borderRadius: 4,
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { grid: { color: '#2e3344' }, ticks: { color: '#9aa0b0' } },
+          y: { grid: { color: '#2e3344' }, ticks: { color: '#9aa0b0' } }
+        }
+      }
+    });
+  }
+});
+</script>
+{% endblock %}

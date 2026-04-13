@@ -1,0 +1,19 @@
+[Unit]
+Description=PiLot Service Watchdog
+Documentation=https://github.com/rtck/pilot
+After=network.target
+
+[Service]
+Type=simple
+User=pilot
+Environment=PYTHONPATH=/opt/pilot/src
+ExecStart=/opt/pilot/venv/bin/python -m pilot_watchdog.main
+WatchdogSec=300
+Restart=on-failure
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=pilot-watchdog
+
+[Install]
+WantedBy=multi-user.target

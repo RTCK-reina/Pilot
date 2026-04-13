@@ -1,0 +1,90 @@
+{% extends "setup_base.html" %}
+
+{% block title %}PiLot Setup - Tesla Account{% endblock %}
+
+{% block step_content %}
+<h2 class="setup-card__title">Connect Tesla Account</h2>
+<p class="setup-card__desc">Sign in with your Tesla account to enable vehicle data access.</p>
+
+<form id="step-form" method="post" action="/setup/step/2">
+
+  <div class="setup-oauth-container">
+    {% if oauth_complete %}
+    <!-- Success state -->
+    <div class="setup-oauth-success">
+      <div class="setup-oauth-success__icon">
+        <svg viewBox="0 0 48 48" fill="none">
+          <circle cx="24" cy="24" r="22" stroke="var(--color-efficiency)" stroke-width="2"/>
+          <polyline points="14 24 22 32 34 16" stroke="var(--color-efficiency)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <p class="setup-oauth-success__text">Tesla account connected successfully.</p>
+    </div>
+
+    {% else %}
+    <!-- Auth button -->
+    <a href="/setup/oauth/start" class="setup-btn setup-btn--tesla">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">
+        <path d="M12 1C5.4 1 2 3.2 2 3.2l1.5 2.1C4.5 4.7 7.5 3 12 3s7.5 1.7 8.5 2.3L22 3.2S18.6 1 12 1zm0 4c-3.1 0-5.4.8-6.5 1.3L7 8.6c.9-.5 2.7-1.1 5-1.1s4.1.6 5 1.1l1.5-2.3C17.4 5.8 15.1 5 12 5zm0 4c-1.8 0-3.2.5-3.9.8L12 22l3.9-12.2C15.2 9.5 13.8 9 12 9z"/>
+      </svg>
+      Sign in with Tesla
+    </a>
+
+    <!-- Divider -->
+    <div class="setup-divider">
+      <span>or scan from your phone</span>
+    </div>
+
+    <!-- QR code for phone handoff -->
+    <div class="setup-qr" id="qr-container">
+      <div class="setup-qr__placeholder" id="qr-code">
+        <!-- QR code rendered by JS -->
+      </div>
+      <p class="setup-qr__hint">Scan with your phone to complete Tesla sign-in on a device with a browser.</p>
+    </div>
+
+    <!-- Polling indicator -->
+    <div class="setup-polling" id="polling-indicator">
+      <div class="setup-polling__dot"></div>
+      <span class="setup-polling__text">Waiting for authentication...</span>
+    </div>
+    {% endif %}
+  </div>
+
+</form>
+{% endblock %}
+
+{% block scripts %}
+{% if not oauth_complete %}
+<script>
+(function() {
+  // Generate QR code as SVG using a minimal encoder
+  const qrUrl = "{{ qr_url }}";
+  const container = document.getElementById("qr-code");
+
+  // Simple QR placeholder with URL text (real QR via qrcode lib server-side or JS lib)
+  container.innerHTML = `
+    <svg viewBox="0 0 200 200" class="setup-qr__svg" xmlns="http://www.w3.org/2000/svg">
+      <rect width="200" height="200" rx="8" fill="var(--color-bg-tertiary)"/>
+      <text x="100" y="90" text-anchor="middle" fill="var(--color-text-secondary)" font-size="12" font-family="var(--font-family)">QR Code</text>
+      <text x="100" y="115" text-anchor="middle" fill="var(--color-text-tertiary)" font-size="9" font-family="var(--font-family)">${qrUrl.substring(0, 35)}...</text>
+    </svg>
+  `;
+
+  // Poll for OAuth completion (phone handoff)
+  const poll = setInterval(async () => {
+    try {
+      const resp = await fetch("/setup/oauth/status");
+      const data = await resp.json();
+      if (data.oauth_complete) {
+        clearInterval(poll);
+        window.location.href = "/setup/step/2";
+      }
+    } catch (e) {
+      // Retry on next interval
+    }
+  }, 3000);
+})();
+</script>
+{% endif %}
+{% endblock %}

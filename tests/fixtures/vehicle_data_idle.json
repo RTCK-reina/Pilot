@@ -1,0 +1,45 @@
+{
+  "drive_state": {
+    "shift_state": null,
+    "speed": null,
+    "latitude": 34.6937,
+    "longitude": 135.5023,
+    "heading": 180,
+    "timestamp": 1712000000000,
+    "power": null
+  },
+  "charge_state": {
+    "battery_level": 80,
+    "usable_battery_level": 80,
+    "battery_range": 198.4,
+    "est_battery_range": 183.7,
+    "charging_state": "Disconnected",
+    "charge_energy_added": 0,
+    "charger_power": 0,
+    "charger_voltage": 0,
+    "charger_actual_current": 0,
+    "charger_phases": null,
+    "charge_port_door_open": false,
+    "conn_charge_cable": "<invalid>"
+  },
+  "climate_state": {
+    "inside_temp": 20.0,
+    "outside_temp": 12.0,
+    "is_climate_on": false,
+    "fan_status": 0,
+    "battery_heater": false
+  },
+  "vehicle_state": {
+    "odometer": 12340.2,
+    "car_version": "2025.50.6 abc123",
+    "tpms_pressure_fl": 2.9,
+    "tpms_pressure_fr": 2.9,
+    "tpms_pressure_rl": 2.9,
+    "tpms_pressure_rr": 2.9
+  },
+  "vehicle_config": {
+    "car_type": "modely",
+    "trim_badging": "74d",
+    "exterior_color": "MidnightSilver"
+  }
+}

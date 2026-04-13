@@ -1,0 +1,20 @@
+[Unit]
+Description=Tesla Fleet API Poller
+Documentation=https://github.com/rtck/pilot
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=pilot
+Environment=PYTHONPATH=/opt/pilot/src
+ExecStart=/opt/pilot/venv/bin/python -m tesla_poller.main
+Restart=always
+RestartSec=10
+MemoryMax=100M
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=tesla-poller
+
+[Install]
+WantedBy=multi-user.target

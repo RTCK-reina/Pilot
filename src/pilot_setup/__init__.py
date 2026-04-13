@@ -1,0 +1,1 @@
+"""PiLot initial setup wizard."""

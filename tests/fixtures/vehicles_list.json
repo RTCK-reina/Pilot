@@ -1,0 +1,12 @@
+[
+  {
+    "id": 12345678901234,
+    "vehicle_id": 9876543210,
+    "vin": "5YJ3E1EAXPF000001",
+    "display_name": "My Tesla",
+    "state": "online",
+    "in_service": false,
+    "calendar_enabled": true,
+    "api_version": 71
+  }
+]

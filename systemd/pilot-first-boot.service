@@ -1,0 +1,17 @@
+[Unit]
+Description=PiLot First Boot Initialization
+Documentation=https://github.com/rtck/pilot
+After=local-fs.target
+Before=pilot-dashboard.service pilot-setup.service tesla-poller.service
+ConditionPathExists=!/var/lib/pilot/.first-boot-done
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/lib/pilot/first-boot.sh
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=pilot-first-boot
+
+[Install]
+WantedBy=multi-user.target

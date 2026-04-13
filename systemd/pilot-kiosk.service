@@ -1,0 +1,18 @@
+[Unit]
+Description=PiLot Kiosk Mode (Cage + Chromium)
+Documentation=https://github.com/rtck/pilot
+After=pilot-dashboard.service
+Requires=pilot-dashboard.service
+
+[Service]
+Type=simple
+User=pilot
+ExecStart=/usr/bin/cage -- /usr/bin/chromium-browser --kiosk --noerrdialogs --disable-translate --no-first-run --disable-infobars --ozone-platform=wayland http://localhost
+Restart=on-failure
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=pilot-kiosk
+
+[Install]
+WantedBy=graphical.target

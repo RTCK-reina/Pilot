@@ -1,0 +1,45 @@
+{% extends "setup_base.html" %}
+
+{% block title %}PiLot Setup - Vehicle Info{% endblock %}
+
+{% block step_content %}
+<h2 class="setup-card__title">Vehicle Information</h2>
+<p class="setup-card__desc">Confirm your vehicle details retrieved from Tesla.</p>
+
+<form id="step-form" method="post" action="/setup/step/3">
+
+  <div class="setup-vehicle-info">
+    <div class="setup-info-row">
+      <span class="setup-info-row__label">Name</span>
+      <span class="setup-info-row__value">{{ vehicle_name }}</span>
+    </div>
+    <div class="setup-info-row">
+      <span class="setup-info-row__label">Model</span>
+      <span class="setup-info-row__value">{{ vehicle_model }}</span>
+    </div>
+    <div class="setup-info-row">
+      <span class="setup-info-row__label">VIN</span>
+      <span class="setup-info-row__value setup-info-row__value--mono">{{ vehicle_vin }}</span>
+    </div>
+    <div class="setup-info-row">
+      <span class="setup-info-row__label">Battery</span>
+      <span class="setup-info-row__value">{{ battery_type }}</span>
+    </div>
+    <div class="setup-info-row">
+      <span class="setup-info-row__label">Software</span>
+      <span class="setup-info-row__value">{{ sw_version }}</span>
+    </div>
+  </div>
+
+  <fieldset class="setup-fieldset">
+    <legend class="setup-fieldset__legend">Efficiency Constant (kWh/km)</legend>
+    <p class="setup-fieldset__hint">Used for energy calculations. Default is based on your vehicle model.</p>
+    <div class="setup-input-wrap">
+      <input type="number" name="efficiency_constant" class="setup-input"
+             value="{{ efficiency_constant }}" step="0.001" min="0.050" max="0.500">
+      <span class="setup-input__unit">kWh/km</span>
+    </div>
+  </fieldset>
+
+</form>
+{% endblock %}

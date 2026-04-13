@@ -1,0 +1,144 @@
+{% if not fragment %}{% extends "base.html" %}{% endif %}
+{% block title %}PiLot - Vehicle{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1 class="page-header__title">Vehicle</h1>
+</div>
+
+<div class="grid grid--vehicle">
+  <!-- Vehicle Identity -->
+  <div class="card card--wide">
+    <div class="card__header">
+      <h2 class="card__title">Vehicle Info</h2>
+    </div>
+    <div class="card__body">
+      <dl class="data-list data-list--horizontal">
+        <div class="data-list__item">
+          <dt>Model</dt>
+          <dd>{{ car.get('model', '--') }}</dd>
+        </div>
+        <div class="data-list__item">
+          <dt>Trim</dt>
+          <dd>{{ car.get('trim', '--') }}</dd>
+        </div>
+        <div class="data-list__item">
+          <dt>VIN</dt>
+          <dd class="font-mono">{{ car.get('vin', '--') }}</dd>
+        </div>
+        <div class="data-list__item">
+          <dt>Color</dt>
+          <dd>{{ car.get('exterior_color', '--') }}</dd>
+        </div>
+        <div class="data-list__item">
+          <dt>Battery Type</dt>
+          <dd>{{ car.get('battery_type', '--') }}</dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+
+  <!-- Odometer / Lifetime -->
+  <div class="card">
+    <div class="card__header">
+      <h2 class="card__title">Lifetime Stats</h2>
+    </div>
+    <div class="card__body">
+      <dl class="data-list">
+        <div class="data-list__item">
+          <dt>Odometer</dt>
+          <dd>{% if odometer is not none %}{{ "%.0f"|format(odometer) }}{% else %}--{% endif %} km</dd>
+        </div>
+        <div class="data-list__item">
+          <dt>Total Energy</dt>
+          <dd>{{ "%.1f"|format(total_energy) }} kWh</dd>
+        </div>
+        <div class="data-list__item">
+          <dt>Lifetime Efficiency</dt>
+          <dd>{{ "%.2f"|format(lifetime_eff) }} km/kWh</dd>
+        </div>
+        <div class="data-list__item">
+          <dt>Total Drives</dt>
+          <dd>{{ total_drives }}</dd>
+        </div>
+        <div class="data-list__item">
+          <dt>Total Charges</dt>
+          <dd>{{ total_charges }}</dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+
+  <!-- Software / Firmware -->
+  <div class="card">
+    <div class="card__header">
+      <h2 class="card__title">Software</h2>
+    </div>
+    <div class="card__body">
+      <dl class="data-list">
+        <div class="data-list__item">
+          <dt>Version</dt>
+          <dd>{{ sw_version or '--' }}</dd>
+        </div>
+        <div class="data-list__item">
+          <dt>Last Updated</dt>
+          <dd>{% if sw_date %}{{ sw_date[:10]|replace('-', '/') }}{% else %}--{% endif %}</dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+
+  <!-- Tire Pressure -->
+  <div class="card">
+    <div class="card__header">
+      <h2 class="card__title">Tire Pressure</h2>
+    </div>
+    <div class="card__body">
+      <div class="tire-grid">
+        <div class="tire tire--fl">
+          <span class="tire__label">FL</span>
+          <span class="tire__value">{% if tpms.get('fl') is not none %}{{ "%.0f"|format(tpms['fl']) }}{% else %}--{% endif %}</span>
+          <span class="tire__unit">kPa</span>
+        </div>
+        <div class="tire tire--fr">
+          <span class="tire__label">FR</span>
+          <span class="tire__value">{% if tpms.get('fr') is not none %}{{ "%.0f"|format(tpms['fr']) }}{% else %}--{% endif %}</span>
+          <span class="tire__unit">kPa</span>
+        </div>
+        <div class="tire tire--rl">
+          <span class="tire__label">RL</span>
+          <span class="tire__value">{% if tpms.get('rl') is not none %}{{ "%.0f"|format(tpms['rl']) }}{% else %}--{% endif %}</span>
+          <span class="tire__unit">kPa</span>
+        </div>
+        <div class="tire tire--rr">
+          <span class="tire__label">RR</span>
+          <span class="tire__value">{% if tpms.get('rr') is not none %}{{ "%.0f"|format(tpms['rr']) }}{% else %}--{% endif %}</span>
+          <span class="tire__unit">kPa</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Climate / State -->
+  <div class="card">
+    <div class="card__header">
+      <h2 class="card__title">Current State</h2>
+    </div>
+    <div class="card__body">
+      <dl class="data-list">
+        <div class="data-list__item">
+          <dt>Climate</dt>
+          <dd>{% if is_climate_on is not none %}{% if is_climate_on %}ON{% else %}OFF{% endif %}{% else %}--{% endif %}</dd>
+        </div>
+        <div class="data-list__item">
+          <dt>Interior Temp</dt>
+          <dd>{% if inside_temp is not none %}{{ "%.1f"|format(inside_temp) }}&deg;C{% else %}--{% endif %}</dd>
+        </div>
+        <div class="data-list__item">
+          <dt>Exterior Temp</dt>
+          <dd>{% if outside_temp is not none %}{{ "%.1f"|format(outside_temp) }}&deg;C{% else %}--{% endif %}</dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,20 @@
+# PiLot OS - Raspberry Pi Boot Configuration
+# /boot/firmware/config.txt
+
+# Reduce GPU memory allocation (headless by default, kiosk uses minimal GPU)
+gpu_mem=16
+
+# Disable onboard audio (not needed for vehicle dashboard)
+dtparam=audio=off
+
+# Enable 64-bit mode
+arm_64bit=1
+
+# Disable Bluetooth (reduce power, attack surface)
+dtoverlay=disable-bt
+
+# Enable HDMI hotplug detection
+hdmi_force_hotplug=0
+
+# Disable splash screen for faster boot
+disable_splash=1

@@ -1,0 +1,155 @@
+{% if not fragment %}{% extends "base.html" %}{% endif %}
+{% block title %}PiLot - Settings{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1 class="page-header__title">Settings</h1>
+</div>
+
+<div class="grid grid--settings">
+  <!-- Display Settings -->
+  <div class="card">
+    <div class="card__header">
+      <h2 class="card__title">Display</h2>
+    </div>
+    <div class="card__body">
+      <div class="form-group">
+        <label class="form-label" for="setting-theme">Theme</label>
+        <select class="select" id="setting-theme">
+          <option value="dark" {% if settings.get('theme') == 'dark' %}selected{% endif %}>Dark</option>
+          <option value="light" {% if settings.get('theme') == 'light' %}selected{% endif %}>Light</option>
+          <option value="auto" {% if settings.get('theme') == 'auto' %}selected{% endif %}>System</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="setting-locale">Locale</label>
+        <select class="select" id="setting-locale">
+          <option value="ja-JP" {% if settings.get('locale', 'ja-JP') == 'ja-JP' %}selected{% endif %}>Japan (km/kWh, JPY)</option>
+          <option value="en-US" {% if settings.get('locale') == 'en-US' %}selected{% endif %}>US (mi/kWh, USD)</option>
+          <option value="en-GB" {% if settings.get('locale') == 'en-GB' %}selected{% endif %}>UK (mi/kWh, GBP)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="setting-date-fmt">Date Format</label>
+        <select class="select" id="setting-date-fmt">
+          <option value="YYYY/MM/DD" {% if settings.get('date_format', 'YYYY/MM/DD') == 'YYYY/MM/DD' %}selected{% endif %}>YYYY/MM/DD</option>
+          <option value="DD/MM/YYYY" {% if settings.get('date_format') == 'DD/MM/YYYY' %}selected{% endif %}>DD/MM/YYYY</option>
+          <option value="MM/DD/YYYY" {% if settings.get('date_format') == 'MM/DD/YYYY' %}selected{% endif %}>MM/DD/YYYY</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charging Costs -->
+  <div class="card">
+    <div class="card__header">
+      <h2 class="card__title">Charging Costs</h2>
+    </div>
+    <div class="card__body">
+      <div class="form-group">
+        <label class="form-label" for="setting-home-rate">Home Rate</label>
+        <div class="input-group">
+          <span class="input-group__prefix">&#165;</span>
+          <input class="input" type="number" id="setting-home-rate" step="0.01" value="{{ settings.get('home_rate', '27.00') }}">
+          <span class="input-group__suffix">/kWh</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="setting-night-rate">Night Rate</label>
+        <div class="input-group">
+          <span class="input-group__prefix">&#165;</span>
+          <input class="input" type="number" id="setting-night-rate" step="0.01" value="{{ settings.get('night_rate', '17.78') }}">
+          <span class="input-group__suffix">/kWh</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="setting-night-start">Night Hours</label>
+        <div class="input-row">
+          <input class="input input--time" type="time" id="setting-night-start" value="{{ settings.get('night_start', '23:00') }}">
+          <span class="input-row__sep">~</span>
+          <input class="input input--time" type="time" id="setting-night-end" value="{{ settings.get('night_end', '07:00') }}">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="setting-sc-rate">Supercharger Rate</label>
+        <div class="input-group">
+          <span class="input-group__prefix">&#165;</span>
+          <input class="input" type="number" id="setting-sc-rate" step="0.01" value="{{ settings.get('sc_rate', '75.00') }}">
+          <span class="input-group__suffix">/kWh</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Data & Polling -->
+  <div class="card">
+    <div class="card__header">
+      <h2 class="card__title">Data Collection</h2>
+    </div>
+    <div class="card__body">
+      <div class="form-group">
+        <label class="form-label" for="setting-poll-interval">Poll Interval</label>
+        <select class="select" id="setting-poll-interval">
+          {% set pi = settings.get('poll_interval', '300') %}
+          <option value="60" {% if pi == '60' %}selected{% endif %}>1 min</option>
+          <option value="120" {% if pi == '120' %}selected{% endif %}>2 min</option>
+          <option value="300" {% if pi == '300' %}selected{% endif %}>5 min</option>
+          <option value="600" {% if pi == '600' %}selected{% endif %}>10 min</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Sleep Prevention</label>
+        <label class="toggle">
+          <input type="checkbox" id="setting-sleep-prevent" {% if settings.get('sleep_prevent', '1') == '1' %}checked{% endif %}>
+          <span class="toggle__slider"></span>
+          <span class="toggle__label">Keep awake while driving</span>
+        </label>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Data Retention</label>
+        <select class="select" id="setting-retention">
+          {% set ret = settings.get('retention', '365') %}
+          <option value="90" {% if ret == '90' %}selected{% endif %}>90 days</option>
+          <option value="180" {% if ret == '180' %}selected{% endif %}>180 days</option>
+          <option value="365" {% if ret == '365' %}selected{% endif %}>1 year</option>
+          <option value="0" {% if ret == '0' %}selected{% endif %}>Unlimited</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- System Info -->
+  <div class="card">
+    <div class="card__header">
+      <h2 class="card__title">System</h2>
+    </div>
+    <div class="card__body">
+      <dl class="data-list">
+        <div class="data-list__item">
+          <dt>PiLot Version</dt>
+          <dd id="sys-version">{{ settings.get('pilot_version', '--') }}</dd>
+        </div>
+        <div class="data-list__item">
+          <dt>Uptime</dt>
+          <dd id="sys-uptime">--</dd>
+        </div>
+        <div class="data-list__item">
+          <dt>DB Size</dt>
+          <dd id="sys-db-size">--</dd>
+        </div>
+        <div class="data-list__item">
+          <dt>CPU Temp</dt>
+          <dd id="sys-cpu-temp">--</dd>
+        </div>
+        <div class="data-list__item">
+          <dt>Disk Free</dt>
+          <dd id="sys-disk-free">--</dd>
+        </div>
+      </dl>
+      <div class="form-actions">
+        <button class="btn btn--outline" id="btn-export-db">Export Database</button>
+        <button class="btn btn--danger" id="btn-restart">Restart Service</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

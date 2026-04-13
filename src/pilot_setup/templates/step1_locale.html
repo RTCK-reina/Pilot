@@ -1,0 +1,92 @@
+{% extends "setup_base.html" %}
+
+{% block title %}PiLot Setup - Language & Region{% endblock %}
+
+{% block step_content %}
+<h2 class="setup-card__title">Language & Region</h2>
+<p class="setup-card__desc">Choose your language and regional preferences.</p>
+
+<form id="step-form" method="post" action="/setup/step/1" class="setup-form">
+
+  <!-- Language -->
+  <fieldset class="setup-fieldset">
+    <legend class="setup-fieldset__legend">Language</legend>
+    <div class="setup-radio-group">
+      <label class="setup-radio">
+        <input type="radio" name="language" value="ja" {% if language == 'ja' %}checked{% endif %}>
+        <span class="setup-radio__mark"></span>
+        <span class="setup-radio__label">日本語</span>
+      </label>
+      <label class="setup-radio">
+        <input type="radio" name="language" value="en" {% if language == 'en' %}checked{% endif %}>
+        <span class="setup-radio__mark"></span>
+        <span class="setup-radio__label">English</span>
+      </label>
+    </div>
+  </fieldset>
+
+  <!-- Timezone -->
+  <fieldset class="setup-fieldset">
+    <legend class="setup-fieldset__legend">Timezone</legend>
+    <div class="setup-select-wrap">
+      <select name="timezone" class="setup-select">
+        <option value="Asia/Tokyo" {% if timezone == 'Asia/Tokyo' %}selected{% endif %}>Asia/Tokyo (JST)</option>
+        <option value="America/Los_Angeles" {% if timezone == 'America/Los_Angeles' %}selected{% endif %}>America/Los_Angeles (PST)</option>
+        <option value="America/New_York" {% if timezone == 'America/New_York' %}selected{% endif %}>America/New_York (EST)</option>
+        <option value="America/Chicago" {% if timezone == 'America/Chicago' %}selected{% endif %}>America/Chicago (CST)</option>
+        <option value="America/Denver" {% if timezone == 'America/Denver' %}selected{% endif %}>America/Denver (MST)</option>
+        <option value="Europe/London" {% if timezone == 'Europe/London' %}selected{% endif %}>Europe/London (GMT)</option>
+        <option value="Europe/Berlin" {% if timezone == 'Europe/Berlin' %}selected{% endif %}>Europe/Berlin (CET)</option>
+        <option value="Europe/Paris" {% if timezone == 'Europe/Paris' %}selected{% endif %}>Europe/Paris (CET)</option>
+        <option value="Australia/Sydney" {% if timezone == 'Australia/Sydney' %}selected{% endif %}>Australia/Sydney (AEST)</option>
+        <option value="Pacific/Auckland" {% if timezone == 'Pacific/Auckland' %}selected{% endif %}>Pacific/Auckland (NZST)</option>
+      </select>
+      <svg class="setup-select__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="6 9 12 15 18 9"/>
+      </svg>
+    </div>
+  </fieldset>
+
+  <!-- Efficiency Unit -->
+  <fieldset class="setup-fieldset">
+    <legend class="setup-fieldset__legend">Efficiency Unit</legend>
+    <div class="setup-radio-group setup-radio-group--cols">
+      <label class="setup-radio">
+        <input type="radio" name="efficiency_unit" value="km/kWh" {% if efficiency_unit == 'km/kWh' %}checked{% endif %}>
+        <span class="setup-radio__mark"></span>
+        <span class="setup-radio__label">km/kWh</span>
+      </label>
+      <label class="setup-radio">
+        <input type="radio" name="efficiency_unit" value="Wh/km" {% if efficiency_unit == 'Wh/km' %}checked{% endif %}>
+        <span class="setup-radio__mark"></span>
+        <span class="setup-radio__label">Wh/km</span>
+      </label>
+      <label class="setup-radio">
+        <input type="radio" name="efficiency_unit" value="kWh/100km" {% if efficiency_unit == 'kWh/100km' %}checked{% endif %}>
+        <span class="setup-radio__mark"></span>
+        <span class="setup-radio__label">kWh/100km</span>
+      </label>
+    </div>
+  </fieldset>
+
+  <!-- Currency -->
+  <fieldset class="setup-fieldset">
+    <legend class="setup-fieldset__legend">Currency</legend>
+    <div class="setup-select-wrap">
+      <select name="currency" class="setup-select">
+        <option value="JPY" {% if currency == 'JPY' %}selected{% endif %}>JPY (&#165;)</option>
+        <option value="USD" {% if currency == 'USD' %}selected{% endif %}>USD ($)</option>
+        <option value="EUR" {% if currency == 'EUR' %}selected{% endif %}>EUR (&euro;)</option>
+        <option value="GBP" {% if currency == 'GBP' %}selected{% endif %}>GBP (&pound;)</option>
+        <option value="AUD" {% if currency == 'AUD' %}selected{% endif %}>AUD ($)</option>
+        <option value="NZD" {% if currency == 'NZD' %}selected{% endif %}>NZD ($)</option>
+        <option value="CAD" {% if currency == 'CAD' %}selected{% endif %}>CAD ($)</option>
+      </select>
+      <svg class="setup-select__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="6 9 12 15 18 9"/>
+      </svg>
+    </div>
+  </fieldset>
+
+</form>
+{% endblock %}

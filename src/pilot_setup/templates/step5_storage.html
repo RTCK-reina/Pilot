@@ -1,0 +1,84 @@
+{% extends "setup_base.html" %}
+
+{% block title %}PiLot Setup - Storage{% endblock %}
+
+{% block step_content %}
+<h2 class="setup-card__title">Storage Configuration</h2>
+<p class="setup-card__desc">Configure where PiLot stores your data.</p>
+
+<form id="step-form" method="post" action="/setup/step/5" class="setup-form">
+
+  <!-- Local SD Card (always present) -->
+  <div class="setup-storage-item">
+    <div class="setup-storage-item__icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="24" height="24">
+        <rect x="2" y="4" width="20" height="16" rx="2"/>
+        <path d="M6 4v4M10 4v4M14 4v4"/>
+      </svg>
+    </div>
+    <div class="setup-storage-item__info">
+      <span class="setup-storage-item__name">SD Card (Local)</span>
+      <span class="setup-storage-item__desc">Primary storage for the SQLite database and logs.</span>
+    </div>
+    <div class="setup-storage-item__status setup-storage-item__status--active">
+      Active
+    </div>
+  </div>
+
+  <!-- USB SSD -->
+  <div class="setup-storage-item">
+    <div class="setup-storage-item__icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="24" height="24">
+        <rect x="4" y="4" width="16" height="16" rx="2"/>
+        <path d="M9 4v16M15 4v16"/>
+        <path d="M4 9h16M4 15h16"/>
+      </svg>
+    </div>
+    <div class="setup-storage-item__info">
+      <span class="setup-storage-item__name">USB SSD</span>
+      <span class="setup-storage-item__desc">
+        {% if usb_detected %}
+        External USB drive detected. Enable to use for backups and extended storage.
+        {% else %}
+        No USB drive detected. Connect a USB SSD to enable.
+        {% endif %}
+      </span>
+    </div>
+    <label class="setup-toggle">
+      <input type="checkbox" name="storage_usb" value="true"
+             {% if storage_usb %}checked{% endif %}
+             {% if not usb_detected %}disabled{% endif %}>
+      <span class="setup-toggle__track">
+        <span class="setup-toggle__thumb"></span>
+      </span>
+    </label>
+  </div>
+
+  <!-- Google Drive -->
+  <div class="setup-storage-item">
+    <div class="setup-storage-item__icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="24" height="24">
+        <path d="M12 2L2 19.5h20L12 2z"/>
+        <path d="M16.5 19.5L22 9.5H8.5"/>
+        <path d="M7.5 19.5L2 9.5h13.5"/>
+      </svg>
+    </div>
+    <div class="setup-storage-item__info">
+      <span class="setup-storage-item__name">Google Drive</span>
+      <span class="setup-storage-item__desc">Cloud backup of database snapshots (requires separate OAuth).</span>
+    </div>
+    <label class="setup-toggle">
+      <input type="checkbox" name="storage_gdrive" value="true"
+             {% if storage_gdrive %}checked{% endif %}>
+      <span class="setup-toggle__track">
+        <span class="setup-toggle__thumb"></span>
+      </span>
+    </label>
+  </div>
+
+  <!-- Hidden field to ensure unchecked checkboxes submit -->
+  <input type="hidden" name="storage_usb" value="false">
+  <input type="hidden" name="storage_gdrive" value="false">
+
+</form>
+{% endblock %}

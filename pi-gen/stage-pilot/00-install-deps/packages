@@ -1,0 +1,11 @@
+python3
+python3-venv
+python3-pip
+cage
+chromium-browser
+rclone
+nftables
+avahi-daemon
+git
+gh
+curl

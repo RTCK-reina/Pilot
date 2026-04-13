@@ -1,0 +1,127 @@
+{% extends "setup_base.html" %}
+
+{% block title %}PiLot Setup - Complete{% endblock %}
+
+{% block step_content %}
+{% if request.query_params.get('done') == '1' %}
+<!-- Post-activation state -->
+<div class="setup-complete-done">
+  <div class="setup-complete-done__icon">
+    <svg viewBox="0 0 64 64" fill="none">
+      <circle cx="32" cy="32" r="30" stroke="var(--color-efficiency)" stroke-width="2"/>
+      <polyline points="18 32 28 42 46 22" stroke="var(--color-efficiency)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+  <h2 class="setup-card__title">PiLot is Running</h2>
+  <p class="setup-card__desc">Setup is complete. Your dashboard is now active on port 80.</p>
+  <a href="http://localhost/" class="setup-btn setup-btn--primary setup-btn--lg">
+    Open Dashboard
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+      <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/>
+      <polyline points="15 3 21 3 21 9"/>
+      <line x1="10" y1="14" x2="21" y2="3"/>
+    </svg>
+  </a>
+</div>
+
+{% else %}
+<!-- Summary before activation -->
+<h2 class="setup-card__title">Setup Summary</h2>
+<p class="setup-card__desc">Review your configuration and start PiLot.</p>
+
+<form id="step-form" method="post" action="/setup/step/7">
+
+  <div class="setup-summary">
+    <!-- Locale -->
+    <div class="setup-summary__section">
+      <h3 class="setup-summary__heading">Language & Region</h3>
+      <div class="setup-summary__grid">
+        <span class="setup-summary__label">Language</span>
+        <span class="setup-summary__value">{{ settings.get('language', '---') }}</span>
+        <span class="setup-summary__label">Timezone</span>
+        <span class="setup-summary__value">{{ settings.get('timezone', '---') }}</span>
+        <span class="setup-summary__label">Efficiency</span>
+        <span class="setup-summary__value">{{ settings.get('efficiency_unit', '---') }}</span>
+        <span class="setup-summary__label">Currency</span>
+        <span class="setup-summary__value">{{ settings.get('currency', '---') }}</span>
+      </div>
+    </div>
+
+    <!-- Vehicle -->
+    <div class="setup-summary__section">
+      <h3 class="setup-summary__heading">Vehicle</h3>
+      <div class="setup-summary__grid">
+        <span class="setup-summary__label">Name</span>
+        <span class="setup-summary__value">{{ settings.get('vehicle_name', '---') }}</span>
+        <span class="setup-summary__label">Model</span>
+        <span class="setup-summary__value">{{ settings.get('vehicle_model', '---') }}</span>
+        <span class="setup-summary__label">VIN</span>
+        <span class="setup-summary__value setup-summary__value--mono">{{ settings.get('vehicle_vin', '---') }}</span>
+      </div>
+    </div>
+
+    <!-- Rates -->
+    <div class="setup-summary__section">
+      <h3 class="setup-summary__heading">Electricity</h3>
+      <div class="setup-summary__grid">
+        <span class="setup-summary__label">Rate Type</span>
+        <span class="setup-summary__value">{{ settings.get('rate_type', '---') | upper }}</span>
+        {% if settings.get('rate_type') == 'fixed' %}
+        <span class="setup-summary__label">Rate</span>
+        <span class="setup-summary__value">{{ settings.get('rate_fixed', '---') }} {{ settings.get('currency', '') }}/kWh</span>
+        {% else %}
+        <span class="setup-summary__label">Night</span>
+        <span class="setup-summary__value">{{ settings.get('rate_night', '---') }} {{ settings.get('currency', '') }}/kWh</span>
+        <span class="setup-summary__label">Day</span>
+        <span class="setup-summary__value">{{ settings.get('rate_day', '---') }} {{ settings.get('currency', '') }}/kWh</span>
+        <span class="setup-summary__label">Peak</span>
+        <span class="setup-summary__value">{{ settings.get('rate_peak', '---') }} {{ settings.get('currency', '') }}/kWh</span>
+        {% endif %}
+        <span class="setup-summary__label">Supercharger</span>
+        <span class="setup-summary__value">{{ settings.get('rate_sc', '---') }} {{ settings.get('currency', '') }}/kWh</span>
+      </div>
+    </div>
+
+    <!-- Options -->
+    <div class="setup-summary__section">
+      <h3 class="setup-summary__heading">Options</h3>
+      <div class="setup-summary__grid">
+        <span class="setup-summary__label">Tailscale</span>
+        <span class="setup-summary__value">{{ 'Enabled' if settings.get('tailscale_enabled') == 'true' else 'Disabled' }}</span>
+        <span class="setup-summary__label">Claude Code</span>
+        <span class="setup-summary__value">{{ 'Enabled' if settings.get('claude_enabled') == 'true' else 'Disabled' }}</span>
+        <span class="setup-summary__label">GitHub CLI</span>
+        <span class="setup-summary__value">{{ 'Enabled' if settings.get('github_cli_enabled') == 'true' else 'Disabled' }}</span>
+      </div>
+    </div>
+  </div>
+
+</form>
+{% endif %}
+{% endblock %}
+
+{% block nav_next %}
+{% if request.query_params.get('done') != '1' %}
+<button type="submit" form="step-form" class="setup-btn setup-btn--primary setup-btn--launch">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+    <polygon points="5 3 19 12 5 21 5 3"/>
+  </svg>
+  Start PiLot
+</button>
+{% else %}
+<div></div>
+{% endif %}
+{% endblock %}
+
+{% block nav_back %}
+{% if request.query_params.get('done') != '1' %}
+<a href="/setup/step/6" class="setup-btn setup-btn--ghost">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+    <polyline points="15 18 9 12 15 6"/>
+  </svg>
+  Back
+</a>
+{% else %}
+<div></div>
+{% endif %}
+{% endblock %}

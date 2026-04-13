@@ -1,0 +1,95 @@
+{% extends "setup_base.html" %}
+
+{% block title %}PiLot Setup - Options{% endblock %}
+
+{% block step_content %}
+<h2 class="setup-card__title">Optional Tools</h2>
+<p class="setup-card__desc">Enable additional tools for remote access and development.</p>
+
+<form id="step-form" method="post" action="/setup/step/6" class="setup-form">
+
+  <!-- Tailscale -->
+  <div class="setup-option-item">
+    <div class="setup-option-item__header">
+      <div class="setup-option-item__icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="24" height="24">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/>
+        </svg>
+      </div>
+      <div class="setup-option-item__info">
+        <span class="setup-option-item__name">Tailscale VPN</span>
+        <span class="setup-option-item__desc">Access your PiLot dashboard from anywhere via a private Tailscale network.</span>
+      </div>
+      <label class="setup-toggle">
+        <input type="checkbox" name="tailscale_enabled" value="true"
+               {% if tailscale_enabled %}checked{% endif %}>
+        <span class="setup-toggle__track">
+          <span class="setup-toggle__thumb"></span>
+        </span>
+      </label>
+    </div>
+  </div>
+
+  <!-- Claude Code -->
+  <div class="setup-option-item">
+    <div class="setup-option-item__header">
+      <div class="setup-option-item__icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="24" height="24">
+          <polyline points="16 18 22 12 16 6"/>
+          <polyline points="8 6 2 12 8 18"/>
+        </svg>
+      </div>
+      <div class="setup-option-item__info">
+        <span class="setup-option-item__name">Claude Code</span>
+        <span class="setup-option-item__desc">AI-assisted development and troubleshooting directly on the Pi.</span>
+      </div>
+      <label class="setup-toggle">
+        <input type="checkbox" name="claude_enabled" value="true" id="claude-toggle"
+               {% if claude_enabled %}checked{% endif %}
+               onchange="document.getElementById('claude-key-field').style.display = this.checked ? 'block' : 'none';">
+        <span class="setup-toggle__track">
+          <span class="setup-toggle__thumb"></span>
+        </span>
+      </label>
+    </div>
+    <div id="claude-key-field" class="setup-option-item__extra"
+         style="{% if not claude_enabled %}display:none{% endif %}">
+      <fieldset class="setup-fieldset">
+        <legend class="setup-fieldset__legend">API Key</legend>
+        <p class="setup-fieldset__hint">Your Anthropic API key (stored encrypted).</p>
+        <input type="password" name="claude_api_key" class="setup-input"
+               value="{{ claude_api_key }}" placeholder="sk-ant-...">
+      </fieldset>
+    </div>
+  </div>
+
+  <!-- GitHub CLI -->
+  <div class="setup-option-item">
+    <div class="setup-option-item__header">
+      <div class="setup-option-item__icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="24" height="24">
+          <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/>
+        </svg>
+      </div>
+      <div class="setup-option-item__info">
+        <span class="setup-option-item__name">GitHub CLI</span>
+        <span class="setup-option-item__desc">Pre-installed for version control and issue tracking. Authenticate with <code>gh auth login</code> after setup.</span>
+      </div>
+      <label class="setup-toggle">
+        <input type="checkbox" name="github_cli_enabled" value="true"
+               {% if github_cli_enabled %}checked{% endif %}>
+        <span class="setup-toggle__track">
+          <span class="setup-toggle__thumb"></span>
+        </span>
+      </label>
+    </div>
+  </div>
+
+  <!-- Hidden fields for unchecked checkboxes -->
+  <input type="hidden" name="tailscale_enabled" value="false">
+  <input type="hidden" name="claude_enabled" value="false">
+  <input type="hidden" name="github_cli_enabled" value="false">
+
+</form>
+{% endblock %}

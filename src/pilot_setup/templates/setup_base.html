@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>{% block title %}PiLot Setup{% endblock %}</title>
+  <link rel="stylesheet" href="/static/css/tokens.css">
+  <link rel="stylesheet" href="/static/setup/css/setup.css">
+  {% block head %}{% endblock %}
+</head>
+<body class="setup-body">
+  <div class="setup-container">
+    <!-- Header -->
+    <header class="setup-header">
+      <div class="setup-logo">
+        <svg class="setup-logo__icon" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+          <circle cx="16" cy="16" r="14" stroke="currentColor" stroke-width="2"/>
+          <path d="M10 20 L16 10 L22 20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="setup-logo__text">PiLot Setup</span>
+      </div>
+    </header>
+
+    <!-- Progress dots -->
+    <nav class="setup-progress" aria-label="Setup progress">
+      {% for i in range(1, total_steps + 1) %}
+      <div class="setup-progress__step {% if i < step %}setup-progress__step--done{% endif %} {% if i == step %}setup-progress__step--active{% endif %}">
+        <div class="setup-progress__dot">
+          {% if i < step %}
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 8 7 12 13 4"/>
+          </svg>
+          {% else %}
+          {{ i }}
+          {% endif %}
+        </div>
+        {% if i < total_steps %}
+        <div class="setup-progress__line {% if i < step %}setup-progress__line--done{% endif %}"></div>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </nav>
+
+    <!-- Wizard card -->
+    <main class="setup-card">
+      <div class="setup-card__content">
+        {% block step_content %}{% endblock %}
+      </div>
+    </main>
+
+    <!-- Navigation buttons -->
+    <div class="setup-nav">
+      {% block nav_back %}
+      {% if step > 1 %}
+      <a href="/setup/step/{{ step - 1 }}" class="setup-btn setup-btn--ghost">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+        Back
+      </a>
+      {% else %}
+      <div></div>
+      {% endif %}
+      {% endblock %}
+
+      {% block nav_next %}
+      <button type="submit" form="step-form" class="setup-btn setup-btn--primary">
+        {% if step == total_steps %}
+        Finish
+        {% else %}
+        Next
+        {% endif %}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+          <polyline points="9 18 15 12 9 6"/>
+        </svg>
+      </button>
+      {% endblock %}
+    </div>
+  </div>
+
+  {% block scripts %}{% endblock %}
+</body>
+</html>

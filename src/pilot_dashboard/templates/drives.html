@@ -1,0 +1,124 @@
+{% if not fragment %}{% extends "base.html" %}{% endif %}
+{% block title %}PiLot - Drives{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1 class="page-header__title">Drives</h1>
+</div>
+
+<div class="grid grid--drives">
+  <!-- Summary Stats -->
+  <div class="card card--full">
+    <div class="card__body">
+      <div class="stat-row stat-row--4">
+        <div class="stat stat--highlight-driving">
+          <span class="stat__value">{{ drive_count }}</span>
+          <span class="stat__label">Drives</span>
+        </div>
+        <div class="stat">
+          <span class="stat__value">{{ "%.1f"|format(total_km) }}</span>
+          <span class="stat__label">Total km</span>
+        </div>
+        <div class="stat">
+          <span class="stat__value">{{ "%.1f"|format(avg_km) }}</span>
+          <span class="stat__label">Avg km/drive</span>
+        </div>
+        <div class="stat">
+          <span class="stat__value">{{ total_time }}</span>
+          <span class="stat__label">Total time</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Drive List -->
+  <div class="card card--full">
+    <div class="card__header">
+      <h2 class="card__title">Drive Log</h2>
+    </div>
+    <div class="card__body card__body--flush">
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Distance</th>
+              <th>Duration</th>
+              <th>Efficiency</th>
+              <th>SOC</th>
+              <th>Max Speed</th>
+              <th>Road Type</th>
+            </tr>
+          </thead>
+          <tbody id="drives-tbody">
+            {% if drives %}
+              {% for d in drives %}
+              <tr>
+                <td>{{ d.start_time[:16]|replace('T', ' ')|replace('-', '/') }}</td>
+                <td>{{ "%.1f"|format(d.distance_km or 0) }} km</td>
+                <td>{{ (d.duration_min or 0)|int }} min</td>
+                <td>{{ "%.2f"|format(d.efficiency_kmkwh or 0) }} km/kWh</td>
+                <td>{{ d.start_battery_level or '--' }}% &rarr; {{ d.end_battery_level or '--' }}%</td>
+                <td>{{ d.speed_max or '--' }} km/h</td>
+                <td>
+                  {% if d.road_type == 'highway' %}
+                    <span class="badge" style="background: var(--color-driving)">highway</span>
+                  {% elif d.road_type == 'city' %}
+                    <span class="badge" style="background: var(--color-efficiency)">city</span>
+                  {% elif d.road_type == 'mixed' %}
+                    <span class="badge">mixed</span>
+                  {% else %}
+                    <span class="badge">{{ d.road_type or '--' }}</span>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            {% else %}
+              <tr><td colspan="7" class="table__empty">&#x8D70;&#x884C;&#x30C7;&#x30FC;&#x30BF;&#x304C;&#x3042;&#x308A;&#x307E;&#x305B;&#x3093;</td></tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Drive Detail Panel (appears on row click) -->
+  <div class="card card--full drive-detail" id="drive-detail" hidden>
+    <div class="card__header">
+      <h2 class="card__title" id="drive-detail-title">Drive Detail</h2>
+      <button class="btn btn--ghost" id="drive-detail-close" aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="card__body">
+      <div class="grid grid--2">
+        <div class="chart-container" id="drive-speed-chart">
+          <div class="chart-placeholder">Select a drive</div>
+        </div>
+        <div class="chart-container" id="drive-energy-chart">
+          <div class="chart-placeholder">Select a drive</div>
+        </div>
+      </div>
+      <dl class="data-list data-list--horizontal">
+        <div class="data-list__item">
+          <dt>Energy Used</dt>
+          <dd id="drive-energy-used">--</dd>
+        </div>
+        <div class="data-list__item">
+          <dt>Regen</dt>
+          <dd id="drive-regen">--</dd>
+        </div>
+        <div class="data-list__item">
+          <dt>Avg Speed</dt>
+          <dd id="drive-avg-speed">--</dd>
+        </div>
+        <div class="data-list__item">
+          <dt>Elevation</dt>
+          <dd id="drive-elevation">--</dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+</div>
+{% endblock %}

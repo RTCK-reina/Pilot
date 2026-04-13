@@ -1,0 +1,4 @@
+# PiLot OS - /etc/udev/rules.d/99-pilot-hdmi.rules
+# Trigger HDMI hotplug detection for kiosk auto-start/stop
+
+SUBSYSTEM=="drm", ACTION=="change", RUN+="/usr/lib/pilot/hdmi-detect.sh"

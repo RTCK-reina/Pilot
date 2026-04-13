@@ -1,0 +1,180 @@
+{% if not fragment %}{% extends "base.html" %}{% endif %}
+{% block title %}PiLot - Home{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1 class="page-header__title">Dashboard</h1>
+  <p class="page-header__subtitle" id="last-updated">{% if last_updated %}{{ last_updated }}{% else %}--{% endif %}</p>
+</div>
+
+<div class="grid grid--overview">
+  <!-- SOC Gauge Card -->
+  <div class="card card--soc">
+    <div class="card__header">
+      <h2 class="card__title">Battery</h2>
+    </div>
+    <div class="card__body card__body--center">
+      {% set bl = battery_level if battery_level is not none else 0 %}
+      {% set offset = 534 - (534 * bl / 100) %}
+      {% if bl < 20 %}
+        {% set gauge_color = '#ef4444' %}
+      {% elif bl < 50 %}
+        {% set gauge_color = '#eab308' %}
+      {% else %}
+        {% set gauge_color = '#34d399' %}
+      {% endif %}
+      <div class="soc-gauge" id="soc-gauge">
+        <svg viewBox="0 0 200 200" class="soc-gauge__svg">
+          <circle class="soc-gauge__track" cx="100" cy="100" r="85" fill="none" stroke-width="12"/>
+          <circle class="soc-gauge__fill" cx="100" cy="100" r="85" fill="none" stroke-width="12"
+                  stroke="{{ gauge_color }}"
+                  stroke-dasharray="534" stroke-dashoffset="{{ offset|int }}"
+                  transform="rotate(-90 100 100)"/>
+        </svg>
+        <div class="soc-gauge__label">
+          <span class="soc-gauge__value" id="soc-value">{% if battery_level is not none %}{{ battery_level }}{% else %}--{% endif %}</span>
+          <span class="soc-gauge__unit">%</span>
+        </div>
+      </div>
+      <div class="soc-gauge__range">
+        <span id="range-value">{% if rated_range_km is not none %}{{ rated_range_km }}{% else %}--{% endif %}</span> km
+      </div>
+    </div>
+  </div>
+
+  <!-- Vehicle State Card -->
+  <div class="card card--state">
+    <div class="card__header">
+      <h2 class="card__title">Status</h2>
+      <span class="badge badge--state" id="state-badge">{{ vehicle_state or 'Offline' }}</span>
+    </div>
+    <div class="card__body">
+      <dl class="data-list">
+        <div class="data-list__item">
+          <dt>Location</dt>
+          <dd id="home-location">{% if latitude is not none and longitude is not none %}{{ latitude }}, {{ longitude }}{% else %}---{% endif %}</dd>
+        </div>
+        <div class="data-list__item">
+          <dt>Odometer</dt>
+          <dd><span id="home-odometer">{% if odometer is not none %}{{ "{:,.1f}".format(odometer) }}{% else %}--{% endif %}</span> km</dd>
+        </div>
+        <div class="data-list__item">
+          <dt>Interior</dt>
+          <dd><span id="home-interior-temp">{% if inside_temp is not none %}{{ inside_temp }}{% else %}--{% endif %}</span>&deg;C</dd>
+        </div>
+        <div class="data-list__item">
+          <dt>Exterior</dt>
+          <dd><span id="home-exterior-temp">{% if outside_temp is not none %}{{ outside_temp }}{% else %}--{% endif %}</span>&deg;C</dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+
+  <!-- Today's Driving Card -->
+  <div class="card card--driving">
+    <div class="card__header">
+      <h2 class="card__title">Today</h2>
+    </div>
+    <div class="card__body">
+      <div class="stat-row">
+        <div class="stat">
+          <span class="stat__value" id="today-distance">{{ today_distance }}</span>
+          <span class="stat__label">km</span>
+        </div>
+        <div class="stat">
+          <span class="stat__value" id="today-efficiency">{{ today_efficiency }}</span>
+          <span class="stat__label">km/kWh</span>
+        </div>
+        <div class="stat">
+          <span class="stat__value" id="today-energy">{{ today_energy }}</span>
+          <span class="stat__label">kWh</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charging Summary Card -->
+  <div class="card card--charging">
+    <div class="card__header">
+      <h2 class="card__title">Charging</h2>
+    </div>
+    <div class="card__body">
+      <div class="stat-row">
+        <div class="stat">
+          <span class="stat__value" id="charge-added">{% if charge_energy_added is not none %}{{ charge_energy_added }}{% else %}--{% endif %}</span>
+          <span class="stat__label">kWh added</span>
+        </div>
+        <div class="stat">
+          <span class="stat__value" id="charge-cost">{% if charge_cost is not none %}&yen;{{ charge_cost }}{% else %}--{% endif %}</span>
+          <span class="stat__label">cost</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Efficiency Trend Card -->
+  <div class="card card--trend">
+    <div class="card__header">
+      <h2 class="card__title">Efficiency Trend</h2>
+      <span class="card__period">7 days</span>
+    </div>
+    <div class="card__body">
+      <div class="chart-container" id="home-efficiency-chart">
+        {% if trend_labels_json and trend_labels_json != '[]' %}
+        <canvas id="home-trend-canvas" height="180"></canvas>
+        {% else %}
+        <div class="chart-placeholder">No data</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Drives Card -->
+  <div class="card card--recent">
+    <div class="card__header">
+      <h2 class="card__title">Recent Drives</h2>
+      <a href="/drives" class="card__link" data-nav>View all</a>
+    </div>
+    <div class="card__body card__body--flush">
+      <div class="drive-list" id="recent-drives">
+        {% if recent_drives %}
+          {% for d in recent_drives %}
+          <div class="drive-list__item">
+            <div class="drive-list__meta">
+              <span class="drive-list__date">{{ d.start_time[:10] }}</span>
+              <span class="drive-list__route">{{ d.start_address or '?' }} &rarr; {{ d.end_address or '?' }}</span>
+            </div>
+            <div class="drive-list__stats">
+              <span>{{ d.distance_km }} km</span>
+              <span>{{ d.efficiency_kmkwh }} km/kWh</span>
+            </div>
+          </div>
+          {% endfor %}
+        {% else %}
+          <div class="drive-list__empty">No recent drives</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{% if trend_labels_json and trend_labels_json != '[]' %}
+<script src="/static/vendor/chart.min.js"></script>
+<script src="/static/js/charts.js"></script>
+<script>
+(function() {
+  var labels = {{ trend_labels_json | safe }};
+  var values = {{ trend_values_json | safe }};
+  PilotCharts.line('home-trend-canvas', labels, [{
+    label: 'km/kWh',
+    data: values,
+    borderColor: '#34d399',
+    backgroundColor: 'rgba(52,211,153,0.1)',
+    fill: true,
+    tension: 0.3
+  }]);
+})();
+</script>
+{% endif %}
+{% endblock %}

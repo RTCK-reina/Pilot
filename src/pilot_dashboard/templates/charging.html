@@ -1,0 +1,213 @@
+{% if not fragment %}{% extends "base.html" %}{% endif %}
+{% block title %}PiLot - Charging{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1 class="page-header__title">Charging</h1>
+</div>
+
+<div class="grid grid--charging">
+  <!-- Summary Stats -->
+  <div class="card card--full">
+    <div class="card__body">
+      <div class="stat-row stat-row--4">
+        <div class="stat stat--highlight-charging">
+          <span class="stat__value">{{ session_count }}</span>
+          <span class="stat__label">Sessions</span>
+        </div>
+        <div class="stat">
+          <span class="stat__value">{{ "%.1f"|format(total_kwh) }}</span>
+          <span class="stat__label">kWh added</span>
+        </div>
+        <div class="stat">
+          <span class="stat__value">&yen;{{ total_cost|int }}</span>
+          <span class="stat__label">Total cost</span>
+        </div>
+        <div class="stat">
+          <span class="stat__value">--</span>
+          <span class="stat__label">Avg kW</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charging Over Time -->
+  <div class="card card--wide">
+    <div class="card__header">
+      <h2 class="card__title">Energy Added Over Time</h2>
+    </div>
+    <div class="card__body">
+      <div class="chart-container chart-container--lg">
+        <canvas id="energy-timeline-chart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cost Breakdown -->
+  <div class="card">
+    <div class="card__header">
+      <h2 class="card__title">Cost Breakdown</h2>
+    </div>
+    <div class="card__body">
+      <div class="chart-container">
+        <canvas id="cost-breakdown-chart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charge Session List -->
+  <div class="card card--full">
+    <div class="card__header">
+      <h2 class="card__title">Session Log</h2>
+    </div>
+    <div class="card__body card__body--flush">
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Type</th>
+              <th>Energy</th>
+              <th>Max kW</th>
+              <th>Duration</th>
+              <th>Cost</th>
+              <th>SOC</th>
+            </tr>
+          </thead>
+          <tbody id="charge-sessions-tbody">
+            {% if sessions %}
+              {% for s in sessions %}
+              <tr>
+                <td>{{ s.start_time[:16]|replace('T', ' ')|replace('-', '/') }}</td>
+                <td>
+                  {% if s.charger_type == 'home_ac' %}
+                    <span class="badge" style="background: var(--color-efficiency)">&#x81EA;&#x5B85;AC</span>
+                  {% elif s.charger_type == 'supercharger' %}
+                    <span class="badge" style="background: var(--color-charging)">SC</span>
+                  {% elif s.charger_type == 'chademo' %}
+                    <span class="badge" style="background: var(--color-driving)">CHAdeMO</span>
+                  {% else %}
+                    <span class="badge">{{ s.charger_type or '--' }}</span>
+                  {% endif %}
+                </td>
+                <td>{{ "%.1f"|format(s.charge_energy_added or 0) }} kWh</td>
+                <td>{{ "%.1f"|format(s.max_charger_power or 0) }} kW</td>
+                <td>{{ (s.duration_min or 0)|int }} min</td>
+                <td>&yen;{{ (s.cost_jpy or 0)|int }}</td>
+                <td>{{ s.start_battery_level or '--' }}% &rarr; {{ s.end_battery_level or '--' }}%</td>
+              </tr>
+              {% endfor %}
+            {% else %}
+              <tr><td colspan="7" class="table__empty">&#x5145;&#x96FB;&#x30C7;&#x30FC;&#x30BF;&#x304C;&#x3042;&#x308A;&#x307E;&#x305B;&#x3093;</td></tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Active Charging Card -->
+  <div class="card card--full charging-live" id="charging-live" hidden>
+    <div class="card__header">
+      <h2 class="card__title">Charging Now</h2>
+      <span class="badge badge--charging pulse">Active</span>
+    </div>
+    <div class="card__body">
+      <div class="charging-live__grid">
+        <div class="soc-gauge soc-gauge--sm" id="charge-live-gauge">
+          <svg viewBox="0 0 120 120" class="soc-gauge__svg">
+            <circle class="soc-gauge__track" cx="60" cy="60" r="50" fill="none" stroke-width="8"/>
+            <circle class="soc-gauge__fill" cx="60" cy="60" r="50" fill="none" stroke-width="8"
+                    stroke-dasharray="314" stroke-dashoffset="314"
+                    transform="rotate(-90 60 60)"/>
+          </svg>
+          <div class="soc-gauge__label">
+            <span class="soc-gauge__value" id="charge-live-soc">--</span>
+            <span class="soc-gauge__unit">%</span>
+          </div>
+        </div>
+        <dl class="data-list">
+          <div class="data-list__item">
+            <dt>Power</dt>
+            <dd><span id="charge-live-kw">--</span> kW</dd>
+          </div>
+          <div class="data-list__item">
+            <dt>Voltage</dt>
+            <dd><span id="charge-live-voltage">--</span> V</dd>
+          </div>
+          <div class="data-list__item">
+            <dt>Current</dt>
+            <dd><span id="charge-live-amps">--</span> A</dd>
+          </div>
+          <div class="data-list__item">
+            <dt>Time Remaining</dt>
+            <dd id="charge-live-remaining">--</dd>
+          </div>
+          <div class="data-list__item">
+            <dt>Energy Added</dt>
+            <dd><span id="charge-live-added">--</span> kWh</dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Energy Added Over Time (bar chart)
+  const energyTrend = {{ energy_trend | tojson }};
+  if (energyTrend.length > 0) {
+    const ctx1 = document.getElementById('energy-timeline-chart');
+    if (ctx1) {
+      new Chart(ctx1.getContext('2d'), {
+        type: 'bar',
+        data: {
+          labels: energyTrend.map(d => d.month),
+          datasets: [{
+            label: 'kWh',
+            data: energyTrend.map(d => d.kwh),
+            backgroundColor: '#60a5fa',
+            borderRadius: 4,
+          }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { grid: { color: '#2e3344' }, ticks: { color: '#9aa0b0' } },
+            y: { grid: { color: '#2e3344' }, ticks: { color: '#9aa0b0' } }
+          }
+        }
+      });
+    }
+  }
+
+  // Cost Breakdown (doughnut)
+  const costBreakdown = {{ cost_breakdown | tojson }};
+  if (costBreakdown.length > 0) {
+    const typeLabels = { 'home_ac': '自宅AC', 'supercharger': 'SC', 'chademo': 'CHAdeMO', 'destination': 'Destination', 'other_dc': 'DC' };
+    const colors = { 'home_ac': '#34d399', 'supercharger': '#f87171', 'chademo': '#60a5fa', 'destination': '#a78bfa', 'other_dc': '#fbbf24' };
+    const ctx2 = document.getElementById('cost-breakdown-chart');
+    if (ctx2) {
+      new Chart(ctx2.getContext('2d'), {
+        type: 'doughnut',
+        data: {
+          labels: costBreakdown.map(d => typeLabels[d.charger_type] || d.charger_type),
+          datasets: [{
+            data: costBreakdown.map(d => d.cost),
+            backgroundColor: costBreakdown.map(d => colors[d.charger_type] || '#6b7280'),
+          }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          cutout: '65%',
+          plugins: { legend: { position: 'bottom', labels: { color: '#9aa0b0' } } }
+        }
+      });
+    }
+  }
+});
+</script>
+{% endblock %}

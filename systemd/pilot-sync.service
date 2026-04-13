@@ -1,0 +1,12 @@
+[Unit]
+Description=PiLot Data Sync (Google Drive / External Storage)
+Documentation=https://github.com/rtck/pilot
+
+[Service]
+Type=oneshot
+User=pilot
+Environment=PYTHONPATH=/opt/pilot/src
+ExecStart=/opt/pilot/venv/bin/python -m pilot_sync.main
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=pilot-sync

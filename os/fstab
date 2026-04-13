@@ -1,0 +1,13 @@
+# PiLot OS - /etc/fstab
+# Optimized for SD card longevity and reduced write wear
+
+# Root filesystem: noatime to reduce writes, commit=600 for less frequent journal flushes
+/dev/mmcblk0p2  /           ext4    defaults,noatime,commit=600    0  1
+
+# Boot partition
+/dev/mmcblk0p1  /boot/firmware  vfat  defaults                    0  2
+
+# tmpfs mounts to keep volatile data in RAM and off the SD card
+tmpfs           /tmp        tmpfs   defaults,nosuid,nodev,size=64M     0  0
+tmpfs           /var/log    tmpfs   defaults,nosuid,nodev,noexec,size=32M  0  0
+tmpfs           /var/tmp    tmpfs   defaults,nosuid,nodev,noexec,size=32M  0  0

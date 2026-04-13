@@ -1,0 +1,86 @@
+{% extends "setup_base.html" %}
+
+{% block title %}PiLot Setup - Electricity Rates{% endblock %}
+
+{% block step_content %}
+<h2 class="setup-card__title">Electricity Rates</h2>
+<p class="setup-card__desc">Set your electricity pricing for accurate cost tracking.</p>
+
+<form id="step-form" method="post" action="/setup/step/4" class="setup-form">
+
+  <!-- Rate Type -->
+  <fieldset class="setup-fieldset">
+    <legend class="setup-fieldset__legend">Rate Type</legend>
+    <div class="setup-radio-group">
+      <label class="setup-radio">
+        <input type="radio" name="rate_type" value="fixed"
+               {% if rate_type == 'fixed' %}checked{% endif %}
+               onchange="document.getElementById('tou-fields').style.display='none'; document.getElementById('fixed-field').style.display='block';">
+        <span class="setup-radio__mark"></span>
+        <span class="setup-radio__label">Fixed Rate</span>
+      </label>
+      <label class="setup-radio">
+        <input type="radio" name="rate_type" value="tou"
+               {% if rate_type == 'tou' %}checked{% endif %}
+               onchange="document.getElementById('tou-fields').style.display='block'; document.getElementById('fixed-field').style.display='none';">
+        <span class="setup-radio__mark"></span>
+        <span class="setup-radio__label">Time-of-Use (TOU)</span>
+      </label>
+    </div>
+  </fieldset>
+
+  <!-- Fixed Rate -->
+  <div id="fixed-field" class="setup-rate-section" style="{% if rate_type == 'tou' %}display:none{% endif %}">
+    <fieldset class="setup-fieldset">
+      <legend class="setup-fieldset__legend">Fixed Rate</legend>
+      <div class="setup-input-wrap">
+        <input type="number" name="rate_fixed" class="setup-input"
+               value="{{ rate_fixed }}" step="0.1" min="0">
+        <span class="setup-input__unit">{{ currency }}/kWh</span>
+      </div>
+    </fieldset>
+  </div>
+
+  <!-- TOU Rates -->
+  <div id="tou-fields" class="setup-rate-section" style="{% if rate_type != 'tou' %}display:none{% endif %}">
+    <fieldset class="setup-fieldset">
+      <legend class="setup-fieldset__legend">Night Rate (23:00 - 07:00)</legend>
+      <div class="setup-input-wrap">
+        <input type="number" name="rate_night" class="setup-input"
+               value="{{ rate_night }}" step="0.1" min="0">
+        <span class="setup-input__unit">{{ currency }}/kWh</span>
+      </div>
+    </fieldset>
+
+    <fieldset class="setup-fieldset">
+      <legend class="setup-fieldset__legend">Day Rate (07:00 - 17:00, 21:00 - 23:00)</legend>
+      <div class="setup-input-wrap">
+        <input type="number" name="rate_day" class="setup-input"
+               value="{{ rate_day }}" step="0.1" min="0">
+        <span class="setup-input__unit">{{ currency }}/kWh</span>
+      </div>
+    </fieldset>
+
+    <fieldset class="setup-fieldset">
+      <legend class="setup-fieldset__legend">Peak Rate (17:00 - 21:00)</legend>
+      <div class="setup-input-wrap">
+        <input type="number" name="rate_peak" class="setup-input"
+               value="{{ rate_peak }}" step="0.1" min="0">
+        <span class="setup-input__unit">{{ currency }}/kWh</span>
+      </div>
+    </fieldset>
+  </div>
+
+  <!-- Supercharger Rate -->
+  <fieldset class="setup-fieldset">
+    <legend class="setup-fieldset__legend">Supercharger Rate</legend>
+    <p class="setup-fieldset__hint">Average cost at Tesla Superchargers in your area.</p>
+    <div class="setup-input-wrap">
+      <input type="number" name="rate_sc" class="setup-input"
+             value="{{ rate_sc }}" step="0.1" min="0">
+      <span class="setup-input__unit">{{ currency }}/kWh</span>
+    </div>
+  </fieldset>
+
+</form>
+{% endblock %}

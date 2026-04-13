@@ -1,0 +1,369 @@
+/* ============================================================
+   PiLot Layout — sidebar, bottom nav, status bar, content grid
+   ============================================================ */
+
+/* ---- Sidebar (desktop) ---- */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: var(--sidebar-width);
+  height: 100dvh;
+  background: var(--sidebar-bg);
+  border-right: 1px solid var(--sidebar-border);
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.sidebar__logo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-5) var(--space-5);
+  border-bottom: 1px solid var(--sidebar-border);
+  flex-shrink: 0;
+}
+
+.sidebar__logo-icon {
+  width: 28px;
+  height: 28px;
+  color: var(--color-efficiency);
+  flex-shrink: 0;
+}
+
+.sidebar__logo-text {
+  font-size: var(--text-lg);
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.04em;
+}
+
+.sidebar__nav {
+  flex: 1;
+  padding: var(--space-3) 0;
+}
+
+.sidebar__link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-5);
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  transition: background var(--duration-fast) var(--easing),
+              color var(--duration-fast) var(--easing);
+  border-left: 3px solid transparent;
+}
+
+.sidebar__link:hover {
+  background: var(--color-bg-hover);
+  color: var(--color-text-primary);
+}
+
+.sidebar__link--active {
+  color: var(--color-efficiency);
+  background: var(--color-efficiency-dim);
+  border-left-color: var(--color-efficiency);
+}
+
+.sidebar__icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.sidebar__footer {
+  padding: var(--space-4) var(--space-5);
+  border-top: 1px solid var(--sidebar-border);
+  flex-shrink: 0;
+}
+
+.sidebar__theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  color: var(--color-text-secondary);
+  transition: background var(--duration-fast) var(--easing);
+}
+
+.sidebar__theme-toggle:hover {
+  background: var(--color-bg-hover);
+  color: var(--color-text-primary);
+}
+
+/* Show sun in dark mode, moon in light mode */
+[data-theme="dark"] .icon--sun  { display: block; }
+[data-theme="dark"] .icon--moon { display: none; }
+[data-theme="light"] .icon--sun  { display: none; }
+[data-theme="light"] .icon--moon { display: block; }
+
+
+/* ---- Bottom Nav (mobile) ---- */
+.bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: var(--bottomnav-height);
+  background: var(--bottomnav-bg);
+  border-top: 1px solid var(--sidebar-border);
+  z-index: 100;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+.bottom-nav__link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  color: var(--color-text-tertiary);
+  font-size: var(--text-xs);
+  transition: color var(--duration-fast) var(--easing);
+}
+
+.bottom-nav__link svg {
+  width: 22px;
+  height: 22px;
+}
+
+.bottom-nav__link--active {
+  color: var(--color-efficiency);
+}
+
+
+/* ---- Status Bar ---- */
+.status-bar {
+  position: fixed;
+  top: 0;
+  left: var(--sidebar-width);
+  right: 0;
+  height: var(--statusbar-height);
+  background: var(--statusbar-bg);
+  border-bottom: 1px solid var(--sidebar-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-5);
+  z-index: 90;
+}
+
+.status-bar__vehicle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.status-bar__name {
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-sm);
+}
+
+.status-bar__state {
+  font-size: var(--text-xs);
+  color: var(--color-text-tertiary);
+  padding: 2px var(--space-2);
+  background: var(--color-bg-tertiary);
+  border-radius: var(--radius-full);
+}
+
+.status-bar__metrics {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+}
+
+.status-bar__metric {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+}
+
+.status-bar__metric-value {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+}
+
+.status-bar__metric-unit {
+  font-size: var(--text-xs);
+  color: var(--color-text-tertiary);
+}
+
+.status-bar__connection {
+  color: var(--color-danger);
+  transition: color var(--duration-normal) var(--easing);
+}
+
+.status-bar__connection svg {
+  width: 18px;
+  height: 18px;
+}
+
+.status-bar__connection.connected {
+  color: var(--color-efficiency);
+}
+
+
+/* ---- Main content area ---- */
+.main {
+  margin-left: var(--sidebar-width);
+  margin-top: var(--statusbar-height);
+  padding: var(--space-6);
+  min-height: calc(100dvh - var(--statusbar-height));
+}
+
+
+/* ---- Page Header ---- */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-6);
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.page-header__title {
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-bold);
+}
+
+.page-header__subtitle {
+  font-size: var(--text-xs);
+  color: var(--color-text-tertiary);
+}
+
+.page-header__controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+
+/* ---- Grid layouts ---- */
+.grid {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.grid--overview {
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+}
+
+.grid--efficiency,
+.grid--drives,
+.grid--charging,
+.grid--battery,
+.grid--vehicle,
+.grid--settings {
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+}
+
+.grid--2 {
+  grid-template-columns: 1fr 1fr;
+}
+
+/* Full-width cards */
+.card--full {
+  grid-column: 1 / -1;
+}
+
+/* Two-column span */
+.card--wide {
+  grid-column: span 2;
+}
+
+
+/* ---- Responsive: tablet ---- */
+@media (max-width: 1024px) {
+  .sidebar {
+    width: var(--sidebar-collapsed);
+  }
+
+  .sidebar__logo-text,
+  .sidebar__link span {
+    display: none;
+  }
+
+  .sidebar__link {
+    justify-content: center;
+    padding: var(--space-3) var(--space-2);
+    border-left-width: 0;
+    border-radius: var(--radius-md);
+    margin: 2px var(--space-2);
+  }
+
+  .sidebar__logo {
+    justify-content: center;
+    padding: var(--space-4) var(--space-2);
+  }
+
+  .status-bar {
+    left: var(--sidebar-collapsed);
+  }
+
+  .main {
+    margin-left: var(--sidebar-collapsed);
+  }
+
+  .card--wide {
+    grid-column: 1 / -1;
+  }
+}
+
+
+/* ---- Responsive: mobile ---- */
+@media (max-width: 768px) {
+  .sidebar {
+    display: none;
+  }
+
+  .bottom-nav {
+    display: flex;
+    align-items: stretch;
+    justify-content: space-around;
+  }
+
+  .status-bar {
+    left: 0;
+  }
+
+  .main {
+    margin-left: 0;
+    margin-bottom: var(--bottomnav-height);
+    padding: var(--space-4);
+  }
+
+  .grid--overview,
+  .grid--efficiency,
+  .grid--drives,
+  .grid--charging,
+  .grid--battery,
+  .grid--vehicle,
+  .grid--settings {
+    grid-template-columns: 1fr;
+  }
+
+  .card--wide {
+    grid-column: 1;
+  }
+
+  .grid--2 {
+    grid-template-columns: 1fr;
+  }
+
+  .stat-row--4 {
+    flex-wrap: wrap;
+  }
+
+  .data-list--horizontal {
+    flex-direction: column;
+  }
+}

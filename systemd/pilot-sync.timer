@@ -1,0 +1,11 @@
+[Unit]
+Description=PiLot Data Sync Timer (daily)
+Documentation=https://github.com/rtck/pilot
+
+[Timer]
+OnCalendar=daily
+RandomizedDelaySec=1800
+Persistent=true
+
+[Install]
+WantedBy=timers.target
