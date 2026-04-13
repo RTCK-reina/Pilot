@@ -80,7 +80,7 @@
                 <td>{{ s.start_time[:16]|replace('T', ' ')|replace('-', '/') }}</td>
                 <td>
                   {% if s.charger_type == 'home_ac' %}
-                    <span class="badge" style="background: var(--color-efficiency)">&#x81EA;&#x5B85;AC</span>
+                    <span class="badge" style="background: var(--color-efficiency)">Home AC</span>
                   {% elif s.charger_type == 'supercharger' %}
                     <span class="badge" style="background: var(--color-charging)">SC</span>
                   {% elif s.charger_type == 'chademo' %}
@@ -97,7 +97,7 @@
               </tr>
               {% endfor %}
             {% else %}
-              <tr><td colspan="7" class="table__empty">&#x5145;&#x96FB;&#x30C7;&#x30FC;&#x30BF;&#x304C;&#x3042;&#x308A;&#x307E;&#x305B;&#x3093;</td></tr>
+              <tr><td colspan="7" class="table__empty">No charging data</td></tr>
             {% endif %}
           </tbody>
         </table>
@@ -187,7 +187,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // Cost Breakdown (doughnut)
   const costBreakdown = {{ cost_breakdown | tojson }};
   if (costBreakdown.length > 0) {
-    const typeLabels = { 'home_ac': '自宅AC', 'supercharger': 'SC', 'chademo': 'CHAdeMO', 'destination': 'Destination', 'other_dc': 'DC' };
+    const typeLabels = { 'home_ac': 'Home AC', 'supercharger': 'SC', 'chademo': 'CHAdeMO', 'destination': 'Destination', 'other_dc': 'DC' };
     const colors = { 'home_ac': '#34d399', 'supercharger': '#f87171', 'chademo': '#60a5fa', 'destination': '#a78bfa', 'other_dc': '#fbbf24' };
     const ctx2 = document.getElementById('cost-breakdown-chart');
     if (ctx2) {
