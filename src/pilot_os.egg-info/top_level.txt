@@ -1,6 +1,0 @@
-pilot_common
-pilot_dashboard
-pilot_setup
-pilot_sync
-pilot_watchdog
-tesla_poller
